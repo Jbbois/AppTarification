@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>Application de Tarification</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Application de Tarification</h1>
+    <form id="calcForm">
+      <label for="categorie">Catégorie :</label>
+      <select id="categorie" required>
+        <option value="">Sélectionnez une catégorie</option>
+        <option value="Bois de chauffage">Bois de chauffage</option>
+        <option value="Granulés de bois">Granulés de bois</option>
+        <option value="Piquets">Piquets</option>
+        <option value="Autres">Autres</option>
+      </select>
+      
+      <label for="produit">Produit :</label>
+      <select id="produit" required>
+        <option value="">Sélectionnez un produit</option>
+      </select>
+      
+      <label for="quantite">Quantité :</label>
+      <input type="number" id="quantite" required min="1">
+      
+      <label for="ville">Ville de livraison :</label>
+      <select id="ville" required>
+        <option value="">Sélectionnez une ville</option>
+      </select>
+      
+      <button type="submit">Calculer</button>
+    </form>
+    
+    <div id="resultats">
+      <h2>Résultats</h2>
+      <p>Prix Unitaire : <span id="prixUnitaire"></span> €</p>
+      <p>Frais de Livraison : <span id="fraisLivraison"></span> €</p>
+      <p>Montant Total : <span id="montantTotal"></span> €</p>
+      <p>Coût Unitaire avec Livraison : <span id="coutUnitaire"></span> €</p>
+    </div>
+    
+    <div id="uploadExcel">
+      <h2>Charger le fichier Excel</h2>
+      <input type="file" id="fileInput" accept=".xlsx, .xls">
+      <button id="loadExcel">Charger les données</button>
+    </div>
+  </div>
+  
+  <!-- Inclusion de la bibliothèque SheetJS pour lire le fichier Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
