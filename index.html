@@ -5,54 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
-  <title>Application de Tarification</title>
+  <title>Application de Tarification PWA</title>
 </head>
 <body>
   <div class="container">
     <h1>Application de Tarification</h1>
-    <form id="calcForm">
-      <label for="categorie">Catégorie :</label>
-      <select id="categorie" required>
-        <option value="">Sélectionnez une catégorie</option>
-        <option value="Bois de chauffage">Bois de chauffage</option>
-        <option value="Granulés de bois">Granulés de bois</option>
-        <option value="Piquets">Piquets</option>
-        <option value="Autres">Autres</option>
-      </select>
-      
-      <label for="produit">Produit :</label>
-      <select id="produit" required>
-        <option value="">Sélectionnez un produit</option>
-      </select>
-      
-      <label for="quantite">Quantité :</label>
-      <input type="number" id="quantite" required min="1">
-      
-      <label for="ville">Ville de livraison :</label>
-      <select id="ville" required>
-        <option value="">Sélectionnez une ville</option>
-      </select>
-      
-      <button type="submit">Calculer</button>
-    </form>
     
-    <div id="resultats">
-      <h2>Résultats</h2>
-      <p>Prix Unitaire : <span id="prixUnitaire"></span> €</p>
-      <p>Frais de Livraison : <span id="fraisLivraison"></span> €</p>
-      <p>Montant Total : <span id="montantTotal"></span> €</p>
-      <p>Coût Unitaire avec Livraison : <span id="coutUnitaire"></span> €</p>
+    <!-- Sélection de la catégorie -->
+    <label for="categorie">Sélectionnez la catégorie :</label>
+    <select id="categorie">
+      <option value="">Choisir une catégorie</option>
+      <option value="bois">Bois de chauffage</option>
+      <option value="granules">Granulés</option>
+      <option value="piquets">Piquets</option>
+    </select>
+    
+    <!-- Section Bois de chauffage -->
+    <div id="section-bois" class="section" style="display:none;">
+      <h2>Bois de chauffage</h2>
+      <label for="bois-longueur">Longueur :</label>
+      <select id="bois-longueur">
+        <option value="">Choisir une longueur</option>
+        <option value="25">25 cm</option>
+        <option value="30">30 cm</option>
+        <option value="40">40 cm</option>
+        <option value="50">50 cm</option>
+      </select>
+      <label for="bois-ville">Ville / Code postal :</label>
+      <input type="text" id="bois-ville" placeholder="ex: 40800">
+      <label for="bois-quantite">Quantité :</label>
+      <input type="number" id="bois-quantite" min="1">
+      <button id="calculer-bois">Calculer</button>
+      <div id="resultats-bois">
+        <p>Prix unitaire : <span id="bois-prix-unitaire"></span> €</p>
+        <p>Somme totale : <span id="bois-somme-totale"></span> €</p>
+      </div>
     </div>
     
-    <div id="uploadExcel">
-      <h2>Charger le fichier Excel</h2>
-      <input type="file" id="fileInput" accept=".xlsx, .xls">
-      <button id="loadExcel">Charger les données</button>
+    <!-- Section Granulés -->
+    <div id="section-granules" class="section" style="display:none;">
+      <h2>Granulés</h2>
+      <label for="granules-type">Type de commande :</label>
+      <select id="granules-type">
+        <option value="">Choisir une option</option>
+        <option value="sacs">Sacs sans livraison</option>
+        <option value="palette-sans">Palettes sans livraison</option>
+        <option value="palette-avec">Palettes avec livraison</option>
+      </select>
+      <div id="granules-inputs">
+        <label for="granules-quantite">Quantité :</label>
+        <input type="number" id="granules-quantite" min="1">
+        <!-- Pour palettes avec livraison, on peut demander la ville (ou le code postal) -->
+        <div id="granules-ville-section" style="display:none;">
+          <label for="granules-ville">Ville / Code postal :</label>
+          <input type="text" id="granules-ville" placeholder="ex: 40800">
+        </div>
+      </div>
+      <button id="calculer-granules">Calculer</button>
+      <div id="resultats-granules">
+        <p>Prix total : <span id="granules-total"></span> €</p>
+        <p id="granules-moyen-section" style="display:none;">Prix moyen par palette : <span id="granules-moyen"></span> €</p>
+      </div>
+    </div>
+    
+    <!-- Section Piquets -->
+    <div id="section-piquets" class="section" style="display:none;">
+      <h2>Piquets</h2>
+      <label for="piquets-longueur">Longueur :</label>
+      <select id="piquets-longueur">
+        <option value="">Choisir une longueur</option>
+        <option value="1.5">1,50 m</option>
+        <option value="2">2,00 m</option>
+      </select>
+      <label for="piquets-quantite">Quantité :</label>
+      <input type="number" id="piquets-quantite" min="1">
+      <button id="calculer-piquets">Calculer</button>
+      <div id="resultats-piquets">
+        <p>Total HT : <span id="piquets-total-ht"></span> €</p>
+        <p>Total TTC : <span id="piquets-total-ttc"></span> €</p>
+      </div>
     </div>
   </div>
   
-  <!-- Inclusion de la bibliothèque SheetJS pour lire le fichier Excel -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="main.js"></script>
+  <!-- Enregistrement du Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(function(registration) {
+            console.log('ServiceWorker enregistré avec succès : ', registration.scope);
+          }, function(err) {
+            console.log('L’enregistrement du ServiceWorker a échoué : ', err);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
