@@ -70,7 +70,10 @@ function populateVilles() {
 document.getElementById('calcForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const produitOption = document.getElementById('produit').selectedOptions[0];
-  const prixUnitaire = parseFloat(produitOption.dataset.prix);
+ const rawPrice = produitOption.dataset.prix;
+// Supprime tout ce qui n'est pas un chiffre, une virgule ou un point, puis remplace la virgule par un point
+const cleanedPrice = rawPrice.replace(/[^0-9,.-]/g, '').replace(',', '.');
+const prixUnitaire = parseFloat(cleanedPrice);
   const quantite = parseFloat(document.getElementById('quantite').value);
   
   const villeOption = document.getElementById('ville').selectedOptions[0];
