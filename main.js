@@ -54,10 +54,73 @@ document.addEventListener('DOMContentLoaded', function() {
   
   /* ----- Partie Granulés ----- */
   // Données simulées pour la partie granulés
-  const granulesData = {
-    sacs: { price: 10 },
-    palette: { sans: 200, avec: { price: 200, livraison: 50 } }
-  };
+// Supposons que tes données sont déjà récupérées depuis Google Sheets et stockées dans des variables
+// Par exemple, granulesData est un tableau d'objets pour l'onglet "Granulés" et
+// livraisonGranulesData est un tableau d'objets pour l'onglet "LivraisonGranules".
+
+// Exemple de données simulées :
+const granulesData = [
+  { marque: "Marque A", prixSac: 10, prixPalette: 190, sacsParPalette: 20 },
+  { marque: "Marque B", prixSac: 11, prixPalette: 200, sacsParPalette: 18 },
+  { marque: "Marque C", prixSac: 9,  prixPalette: 180, sacsParPalette: 22 },
+];
+
+const livraisonGranulesData = [
+  { postal: "40800", ville: "Aire-sur-l’Adour", frais: 50 },
+  { postal: "40320", ville: "Arboucave", frais: 55 },
+  // ... autres entrées
+];
+
+document.getElementById('calculer-granules').addEventListener('click', function() {
+  const type = document.getElementById('granules-type').value;
+  const quantite = parseFloat(document.getElementById('granules-quantite').value);
+  const marqueChoisie = document.getElementById('granules-marque').value;
+  
+  if (!type || !quantite || !marqueChoisie) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+  
+  // Récupérer les données de la marque sélectionnée
+  const dataMarque = granulesData.find(item => item.marque === marqueChoisie);
+  if (!dataMarque) {
+    alert("Données de la marque non trouvées.");
+    return;
+  }
+  
+  let total = 0, moyen = 0;
+  
+  if (type === 'sacs') {
+    // Vente au sac sans livraison
+    total = quantite * dataMarque.prixSac;
+    document.getElementById('granules-total').textContent = total.toFixed(2);
+  } else if (type === 'palette-sans') {
+    // Vente à la palette en retrait
+    total = quantite * dataMarque.prixPalette;
+    document.getElementById('granules-total').textContent = total.toFixed(2);
+  } else if (type === 'palette-avec') {
+    // Vente à la palette avec livraison
+    // Ici, la livraison est forfaitaire et dépend de la ville (ou code postal)
+    const postal = document.getElementById('granules-ville').value;
+    if (!postal) {
+      alert("Veuillez saisir le code postal ou la ville pour la livraison.");
+      return;
+    }
+    // Récupérer les frais de livraison pour le code postal saisi
+    const livraisonInfo = livraisonGranulesData.find(item => item.postal === postal);
+    if (!livraisonInfo) {
+      alert("Aucune donnée de livraison trouvée pour ce code postal.");
+      return;
+    }
+    total = (quantite * dataMarque.prixPalette) + livraisonInfo.frais;
+    moyen = total / quantite;
+    document.getElementById('granules-total').textContent = total.toFixed(2);
+    document.getElementById('granules-moyen').textContent = moyen.toFixed(2);
+  } else {
+    alert("Veuillez choisir une option de commande.");
+  }
+});
+
   
   // Affichage conditionnel de l'input pour la ville si l'option "palette-avec" est choisie
   const granulesType = document.getElementById('granules-type');
