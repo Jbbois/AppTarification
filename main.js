@@ -1,60 +1,81 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Variables globales pour stocker la liste des villes
-  let citiesList = [];
+document.addEventListener('DOMContentLoaded', async function() {
+  // Variables globales pour stocker les données
+  let citiesData = [];
+  let boisData = [];
+  let granulesData = [];
+  let livraisonGranulesData = [];
+  let piquetsData = [];
+  let autresData = [];
 
-  // Remplacez cette URL par l'URL de publication CSV de votre Google Sheet (contenant les villes)
+  // Remplacez les URLs ci-dessous par celles obtenues après publication de chaque onglet en CSV
   const citiesCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1J8m0EAC4kU8eckohcwXyO_NvYOa28ZQ1ORKAHTkr9ajBaPbAH8QombALoYdDJ9NOJAhV0b1X2Ywe/pub?gid=2042850115&single=true&output=csv";
+  const boisCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1J8m0EAC4kU8eckohcwXyO_NvYOa28ZQ1ORKAHTkr9ajBaPbAH8QombALoYdDJ9NOJAhV0b1X2Ywe/pub?gid=0&single=true&output=csv";
+  const granulesCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1J8m0EAC4kU8eckohcwXyO_NvYOa28ZQ1ORKAHTkr9ajBaPbAH8QombALoYdDJ9NOJAhV0b1X2Ywe/pub?gid=1472631647&single=true&output=csv";
+  const livraisonGranulesCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1J8m0EAC4kU8eckohcwXyO_NvYOa28ZQ1ORKAHTkr9ajBaPbAH8QombALoYdDJ9NOJAhV0b1X2Ywe/pub?gid=1356481895&single=true&output=csv";
+  const piquetsCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1J8m0EAC4kU8eckohcwXyO_NvYOa28ZQ1ORKAHTkr9ajBaPbAH8QombALoYdDJ9NOJAhV0b1X2Ywe/pub?gid=437218056&single=true&output=csv";
+  const autresCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1J8m0EAC4kU8eckohcwXyO_NvYOa28ZQ1ORKAHTkr9ajBaPbAH8QombALoYdDJ9NOJAhV0b1X2Ywe/pub?gid=1506881123&single=true&output=csv";
 
-  // Fonction pour charger et parser le CSV depuis Google Sheets
-  async function loadCities() {
-    try {
-      const response = await fetch(citiesCSVUrl);
-      const csvText = await response.text();
-      const lines = csvText.split("\n");
-      citiesList = [];
-      // Supposons que la première ligne est l'en-tête, et que le CSV a au moins 2 colonnes : Code postal et Ville
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        const parts = line.split(",");
-        if (parts.length >= 2) {
-          const code = parts[0].trim();
-          const ville = parts[1].trim();
-          citiesList.push(`${code} - ${ville}`);
-        }
-      }
-      console.log("Liste des villes chargée :", citiesList);
-    } catch (error) {
-      console.error("Erreur lors du chargement des villes :", error);
-    }
+  // Fonction pour récupérer et parser un CSV
+  async function fetchCSV(url) {
+    const response = await fetch(url);
+    const csvText = await response.text();
+    return parseCSV(csvText);
   }
 
-  // Charger la liste des villes dès le chargement de la page
-  loadCities();
+  // Fonction simple de parsing CSV (suppose que les données ne contiennent pas de virgules internes)
+  function parseCSV(csvText) {
+    const lines = csvText.trim().split("\n");
+    const result = [];
+    const headers = lines[0].split(",").map(h => h.trim());
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(",");
+      let obj = {};
+      headers.forEach((header, index) => {
+        obj[header] = values[index] ? values[index].trim() : "";
+      });
+      result.push(obj);
+    }
+    return result;
+  }
 
-  // Fonction générique pour configurer l'autocomplétion sur un champ d'entrée
+  // Charger toutes les données
+  async function loadAllData() {
+    try {
+      citiesData = await fetchCSV(citiesCSVUrl);
+      boisData = await fetchCSV(boisCSVUrl);
+      granulesData = await fetchCSV(granulesCSVUrl);
+      livraisonGranulesData = await fetchCSV(livraisonGranulesCSVUrl);
+      piquetsData = await fetchCSV(piquetsCSVUrl);
+      autresData = await fetchCSV(autresCSVUrl);
+      console.log("Toutes les données sont chargées");
+    } catch (error) {
+      console.error("Erreur lors du chargement des données :", error);
+    }
+  }
+  await loadAllData();
+
+  // Autocomplétion dynamique basée sur citiesData
   function setupAutocomplete(inputElement, suggestionsContainer) {
     inputElement.addEventListener('input', function() {
       const query = this.value.toLowerCase();
-      suggestionsContainer.innerHTML = ""; // Efface les suggestions précédentes
-
+      suggestionsContainer.innerHTML = "";
       if (query.length === 0) return;
-
-      // Filtrer la liste des villes par rapport à la saisie
-      const filteredCities = citiesList.filter(city => city.toLowerCase().includes(query));
-      filteredCities.forEach(city => {
+      const filtered = citiesData.filter(cityObj =>
+        cityObj["Ville"].toLowerCase().includes(query) ||
+        cityObj["Code postal"].toLowerCase().includes(query)
+      );
+      filtered.forEach(cityObj => {
         const suggestionItem = document.createElement('div');
-        suggestionItem.textContent = city;
+        suggestionItem.textContent = `${cityObj["Ville"]} (${cityObj["Code postal"]})`;
         suggestionItem.className = "suggestion-item";
         suggestionItem.addEventListener('click', function() {
-          inputElement.value = city;  // Remplit le champ avec la suggestion
-          suggestionsContainer.innerHTML = ""; // Efface les suggestions
+          inputElement.value = cityObj["Ville"];
+          suggestionsContainer.innerHTML = "";
         });
         suggestionsContainer.appendChild(suggestionItem);
       });
     });
   }
-
   // Configurer l'autocomplétion pour les champs de ville
   const boisVilleInput = document.getElementById('bois-ville');
   const boisSuggestions = document.getElementById('bois-suggestions');
@@ -64,13 +85,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const granulesSuggestions = document.getElementById('granules-suggestions');
   setupAutocomplete(granulesVilleInput, granulesSuggestions);
 
-  /* ----- Gestion des sections de l'application ----- */
+  /* Gestion des sections */
   const categorieSelect = document.getElementById('categorie');
   const sectionBois = document.getElementById('section-bois');
   const sectionGranules = document.getElementById('section-granules');
   const sectionPiquets = document.getElementById('section-piquets');
   const sectionAutres = document.getElementById('section-autres');
-  
+
   categorieSelect.addEventListener('change', function() {
     sectionBois.style.display = 'none';
     sectionGranules.style.display = 'none';
@@ -88,26 +109,21 @@ document.addEventListener('DOMContentLoaded', function() {
       displayAutres();
     }
   });
-  
-  /* ----- Section Bois de chauffage ----- */
-  const boisData = [
-    { postal: "40800", "25": 90, "30": 87, "40": 86, "50": 84 },
-    { postal: "40320", "25": 92, "30": 88, "40": 85, "50": 79 }
-  ];
-  
+
+  /* ----- Section Bois ----- */
   document.getElementById('calculer-bois').addEventListener('click', function() {
     const longueur = document.getElementById('bois-longueur').value;
     const postal = document.getElementById('bois-ville').value;
     const quantite = parseFloat(document.getElementById('bois-quantite').value);
-    
     if (!longueur || !postal || !quantite) {
       alert("Veuillez remplir tous les champs pour le bois.");
       return;
     }
-    
-    const data = boisData.find(item => item.postal === postal);
+    const data = boisData.find(item => 
+      item["Code postal"] === postal || item["Ville"].toLowerCase() === postal.toLowerCase()
+    );
     if (!data) {
-      alert("Aucune donnée trouvée pour ce code postal.");
+      alert("Aucune donnée trouvée pour ce code postal ou cette ville.");
       return;
     }
     const prixUnitaire = data[longueur];
@@ -115,24 +131,23 @@ document.addEventListener('DOMContentLoaded', function() {
       alert("Aucune donnée pour cette longueur.");
       return;
     }
-    const sommeTotale = prixUnitaire * quantite;
-    
-    document.getElementById('bois-prix-unitaire').textContent = prixUnitaire.toFixed(2);
+    const sommeTotale = parseFloat(prixUnitaire) * quantite;
+    document.getElementById('bois-prix-unitaire').textContent = parseFloat(prixUnitaire).toFixed(2);
     document.getElementById('bois-somme-totale').textContent = sommeTotale.toFixed(2);
   });
-  
+
   /* ----- Section Granulés ----- */
-  const granulesData = [
-    { marque: "Marque A", prixSac: 10, prixPalette: 190, sacsParPalette: 20 },
-    { marque: "Marque B", prixSac: 11, prixPalette: 200, sacsParPalette: 18 },
-    { marque: "Marque C", prixSac: 9,  prixPalette: 180, sacsParPalette: 22 }
-  ];
-  
-  const livraisonGranulesData = [
-    { postal: "40800", ville: "Aire-sur-l’Adour", frais: 50 },
-    { postal: "40320", ville: "Arboucave", frais: 55 }
-  ];
-  
+  // Remplir le menu déroulant des marques à partir des données granulesData (supposant que la colonne "Marque" existe)
+  const granulesMarqueSelect = document.getElementById('granules-marque');
+  granulesMarqueSelect.innerHTML = `<option value="">Choisir une marque</option>`;
+  granulesData.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item["Marque"];
+    opt.textContent = item["Marque"];
+    granulesMarqueSelect.appendChild(opt);
+  });
+
+  // Affichage conditionnel de la section ville pour livraison
   const granulesType = document.getElementById('granules-type');
   granulesType.addEventListener('change', function() {
     if (this.value === 'palette-avec') {
@@ -148,24 +163,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const type = document.getElementById('granules-type').value;
     const quantite = parseFloat(document.getElementById('granules-quantite').value);
     const marqueChoisie = document.getElementById('granules-marque').value;
-    
     if (!type || !quantite || !marqueChoisie) {
       alert("Veuillez remplir tous les champs pour les granulés.");
       return;
     }
-    
-    const dataMarque = granulesData.find(item => item.marque === marqueChoisie);
+    const dataMarque = granulesData.find(item => item["Marque"] === marqueChoisie);
     if (!dataMarque) {
       alert("Données de la marque non trouvées.");
       return;
     }
-    
     let total = 0, moyen = 0;
     if (type === 'sacs') {
-      total = quantite * dataMarque.prixSac;
+      total = quantite * parseFloat(dataMarque["Prix Sac"]);
       document.getElementById('granules-total').textContent = total.toFixed(2);
     } else if (type === 'palette-sans') {
-      total = quantite * dataMarque.prixPalette;
+      total = quantite * parseFloat(dataMarque["Prix Palette"]);
       document.getElementById('granules-total').textContent = total.toFixed(2);
     } else if (type === 'palette-avec') {
       const postal = document.getElementById('granules-ville').value;
@@ -173,12 +185,14 @@ document.addEventListener('DOMContentLoaded', function() {
         alert("Veuillez saisir le code postal pour la livraison.");
         return;
       }
-      const livraisonInfo = livraisonGranulesData.find(item => item.postal === postal);
+      const livraisonInfo = livraisonGranulesData.find(item => 
+        item["Code postal"] === postal || item["Ville"].toLowerCase() === postal.toLowerCase()
+      );
       if (!livraisonInfo) {
-        alert("Aucune donnée de livraison trouvée pour ce code postal.");
+        alert("Aucune donnée de livraison trouvée pour ce code postal ou cette ville.");
         return;
       }
-      total = (quantite * dataMarque.prixPalette) + livraisonInfo.frais;
+      total = (quantite * parseFloat(dataMarque["Prix Palette"])) + parseFloat(livraisonInfo["Frais"]);
       moyen = total / quantite;
       document.getElementById('granules-total').textContent = total.toFixed(2);
       document.getElementById('granules-moyen').textContent = moyen.toFixed(2);
@@ -186,55 +200,40 @@ document.addEventListener('DOMContentLoaded', function() {
       alert("Veuillez choisir une option de commande pour les granulés.");
     }
   });
-  
+
   /* ----- Section Piquets ----- */
-  const piquetsData = [
-    { longueur: "1.5", min: 1, max: 49, ht: 3.5, tva: 20, ttc: 4.2 },
-    { longueur: "1.5", min: 50, max: 99, ht: 3.2, tva: 20, ttc: 3.84 },
-    { longueur: "1.5", min: 100, max: Infinity, ht: 3.0, tva: 20, ttc: 3.6 },
-    { longueur: "2", min: 1, max: 49, ht: 4.0, tva: 20, ttc: 4.8 },
-    { longueur: "2", min: 50, max: 99, ht: 3.7, tva: 20, ttc: 4.44 },
-    { longueur: "2", min: 100, max: Infinity, ht: 3.5, tva: 20, ttc: 4.2 }
-  ];
-  
   document.getElementById('calculer-piquets').addEventListener('click', function() {
     const longueur = document.getElementById('piquets-longueur').value;
     const quantite = parseFloat(document.getElementById('piquets-quantite').value);
-    
     if (!longueur || !quantite) {
       alert("Veuillez remplir tous les champs pour les piquets.");
       return;
     }
-    
-    const tier = piquetsData.find(item => item.longueur === longueur && quantite >= item.min && quantite <= item.max);
+    const tier = piquetsData.find(item => 
+      item["Longueur"] === longueur && 
+      quantite >= parseFloat(item["Quantité Min"]) && 
+      quantite <= parseFloat(item["Quantité Max"])
+    );
     if (!tier) {
       alert("Aucun tarif trouvé pour cette combinaison.");
       return;
     }
-    
-    const totalHT = tier.ht * quantite;
-    const totalTTC = tier.ttc * quantite;
-    
+    const totalHT = parseFloat(tier["Prix HT"]) * quantite;
+    const totalTTC = parseFloat(tier["Prix TTC"]) * quantite;
     document.getElementById('piquets-total-ht').textContent = totalHT.toFixed(2);
     document.getElementById('piquets-total-ttc').textContent = totalTTC.toFixed(2);
   });
   
   /* ----- Section Autres ----- */
-  const autresData = [
-    { produit: "Produit X", prix: 25 },
-    { produit: "Produit Y", prix: 30 },
-    { produit: "Produit Z", prix: 15 }
-  ];
-  
   function displayAutres() {
     const tableBody = document.getElementById('autres-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = "";
     autresData.forEach(item => {
       const row = document.createElement('tr');
       const cellProduit = document.createElement('td');
-      cellProduit.textContent = item.produit;
+      cellProduit.textContent = item["Produit"];
       const cellPrix = document.createElement('td');
-      cellPrix.textContent = item.prix.toFixed(2);
+      cellPrix.textContent = parseFloat(item["Prix"]).toFixed(2);
       row.appendChild(cellProduit);
       row.appendChild(cellPrix);
       tableBody.appendChild(row);

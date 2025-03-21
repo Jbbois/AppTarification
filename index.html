@@ -33,8 +33,7 @@
         <option value="50">50 cm</option>
       </select>
       <label for="bois-ville">Ville / Code postal :</label>
-      <input type="text" id="bois-ville" placeholder="ex: 40800">
-      <!-- Conteneur pour les suggestions d'autocomplétion -->
+      <input type="text" id="bois-ville" placeholder="ex: Aire-sur-l’Adour ou 40800">
       <div id="bois-suggestions" class="suggestions"></div>
       <label for="bois-quantite">Quantité :</label>
       <input type="number" id="bois-quantite" min="1">
@@ -51,9 +50,7 @@
       <label for="granules-marque">Marque :</label>
       <select id="granules-marque">
         <option value="">Choisir une marque</option>
-        <option value="Marque A">Marque A</option>
-        <option value="Marque B">Marque B</option>
-        <option value="Marque C">Marque C</option>
+        <!-- Les options seront définies selon vos données (exemple : Marque A, Marque B, Marque C) -->
       </select>
       <label for="granules-type">Type de commande :</label>
       <select id="granules-type">
@@ -67,7 +64,7 @@
         <input type="number" id="granules-quantite" min="1">
         <div id="granules-ville-section" style="display:none;">
           <label for="granules-ville">Ville / Code postal pour livraison :</label>
-          <input type="text" id="granules-ville" placeholder="ex: 40800">
+          <input type="text" id="granules-ville" placeholder="ex: Aire-sur-l’Adour ou 40800">
           <div id="granules-suggestions" class="suggestions"></div>
         </div>
       </div>
@@ -107,7 +104,7 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Les produits seront insérés ici dynamiquement -->
+          <!-- Les données seront insérées ici dynamiquement -->
         </tbody>
       </table>
     </div>

@@ -57,14 +57,14 @@ th, td {
   text-align: left;
 }
 
-/* Style pour la liste de suggestions d'autocomplétion */
+/* Suggestions d'autocomplétion */
 .suggestions {
   border: 1px solid #ccc;
   max-height: 150px;
   overflow-y: auto;
   background-color: #fff;
   position: absolute;
-  width: calc(100% - 22px); /* Ajustez selon la largeur de l'input */
+  width: calc(100% - 22px);
   z-index: 1000;
 }
 
