@@ -18,6 +18,7 @@
       <option value="bois">Bois de chauffage</option>
       <option value="granules">Granulés</option>
       <option value="piquets">Piquets</option>
+      <option value="autres">Autres</option>
     </select>
     
     <!-- Section Bois de chauffage -->
@@ -33,6 +34,8 @@
       </select>
       <label for="bois-ville">Ville / Code postal :</label>
       <input type="text" id="bois-ville" placeholder="ex: 40800">
+      <!-- Conteneur pour les suggestions d'autocomplétion -->
+      <div id="bois-suggestions" class="suggestions"></div>
       <label for="bois-quantite">Quantité :</label>
       <input type="number" id="bois-quantite" min="1">
       <button id="calculer-bois">Calculer</button>
@@ -45,6 +48,13 @@
     <!-- Section Granulés -->
     <div id="section-granules" class="section" style="display:none;">
       <h2>Granulés</h2>
+      <label for="granules-marque">Marque :</label>
+      <select id="granules-marque">
+        <option value="">Choisir une marque</option>
+        <option value="Marque A">Marque A</option>
+        <option value="Marque B">Marque B</option>
+        <option value="Marque C">Marque C</option>
+      </select>
       <label for="granules-type">Type de commande :</label>
       <select id="granules-type">
         <option value="">Choisir une option</option>
@@ -52,20 +62,13 @@
         <option value="palette-sans">Palettes sans livraison</option>
         <option value="palette-avec">Palettes avec livraison</option>
       </select>
-      <label for="granules-marque">Marque :</label>
-<select id="granules-marque">
-  <option value="">Choisir une marque</option>
-  <option value="Marque A">Marque A</option>
-  <option value="Marque B">Marque B</option>
-  <option value="Marque C">Marque C</option>
-</select>
       <div id="granules-inputs">
         <label for="granules-quantite">Quantité :</label>
         <input type="number" id="granules-quantite" min="1">
-        <!-- Pour palettes avec livraison, on peut demander la ville (ou le code postal) -->
         <div id="granules-ville-section" style="display:none;">
-          <label for="granules-ville">Ville / Code postal :</label>
+          <label for="granules-ville">Ville / Code postal pour livraison :</label>
           <input type="text" id="granules-ville" placeholder="ex: 40800">
+          <div id="granules-suggestions" class="suggestions"></div>
         </div>
       </div>
       <button id="calculer-granules">Calculer</button>
@@ -92,6 +95,23 @@
         <p>Total TTC : <span id="piquets-total-ttc"></span> €</p>
       </div>
     </div>
+    
+    <!-- Section Autres -->
+    <div id="section-autres" class="section" style="display:none;">
+      <h2>Produits Autres</h2>
+      <table id="autres-table">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Prix unitaire (€)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Les produits seront insérés ici dynamiquement -->
+        </tbody>
+      </table>
+    </div>
+    
   </div>
   
   <script src="main.js"></script>

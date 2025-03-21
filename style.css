@@ -4,7 +4,6 @@ body {
   margin: 0;
   padding: 20px;
 }
-
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -13,17 +12,14 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
 h1, h2 {
   color: #2e7d32;
 }
-
 label {
   display: block;
   margin-top: 10px;
   color: #388e3c;
 }
-
 input, select, button {
   width: 100%;
   padding: 10px;
@@ -31,7 +27,6 @@ input, select, button {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
 button {
   background-color: #43a047;
   color: white;
@@ -39,15 +34,45 @@ button {
   cursor: pointer;
   margin-top: 15px;
 }
-
 button:hover {
   background-color: #388e3c;
 }
-
 .section {
   margin-top: 20px;
   padding: 15px;
   border: 1px solid #c8e6c9;
   border-radius: 4px;
   background-color: #f1f8e9;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+table, th, td {
+  border: 1px solid #ccc;
+}
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+/* Style pour la liste de suggestions d'autocomplétion */
+.suggestions {
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #fff;
+  position: absolute;
+  width: calc(100% - 22px); /* Ajustez selon la largeur de l'input */
+  z-index: 1000;
+}
+
+.suggestion-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #e0f2f1;
 }
