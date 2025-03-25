@@ -61,12 +61,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       suggestionsContainer.innerHTML = "";
       if (query.length === 0) return;
       const filtered = citiesData.filter(cityObj =>
-        cityObj["Ville"].toLowerCase().includes(query) ||
-        cityObj["Code postal"].toLowerCase().includes(query)
+        cityObj["Ville"].toLowerCase().includes(query)
       );
       filtered.forEach(cityObj => {
         const suggestionItem = document.createElement('div');
-        suggestionItem.textContent = `${cityObj["Ville"]} (${cityObj["Code postal"]})`;
+        suggestionItem.textContent = cityObj["Ville"];
         suggestionItem.className = "suggestion-item";
         suggestionItem.addEventListener('click', function() {
           inputElement.value = cityObj["Ville"];
